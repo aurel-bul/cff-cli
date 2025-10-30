@@ -17,10 +17,10 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "cff",
-	Short: "Liste les prochains départs depuis la gare CFF en donnée.",
+	Use:   "cff <gare>",
+	Short: "Liste les prochains départs depuis la gare CFF donnée.",
 	Long:  `Un outil CLI qui permet de lister les départs de train de n'importe quelle gare Suisse.`,
-
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		//Query API
 		url := fmt.Sprintf("http://transport.opendata.ch/v1/stationboard?station=%s&limit=5", args[0])
@@ -85,7 +85,7 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 //Structs
