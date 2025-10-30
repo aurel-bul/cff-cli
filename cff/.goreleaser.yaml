@@ -43,6 +43,10 @@ changelog:
       - "^docs:"
       - "^test:"
 
+gitlab_urls:
+  api: https://forge.hefr.ch/api/v4/
+  download: https://forge.hefr.ch
+
 release:
   footer: >-
 
