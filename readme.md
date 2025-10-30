@@ -1,6 +1,6 @@
 # CFF-CLI
 
-Un outil CLI qui permet de lister les départs de train de n'importe quelle gare Suisse.
+Un outil CLI écrit en GO qui permet de lister les départs de train de n'importe quelle gare Suisse.
 
 <p align="center">
   <img width="300" src="./img/showoff.png">
@@ -32,13 +32,13 @@ Exemple:
 <details>
 <summary>Windows</summary>
 
-```sh
+```cmd
 .\cff <gare>
 ```
 
 Exemple:
 
-```sh
+```cmd
 .\cff Fribourg
 ```
 
