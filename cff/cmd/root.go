@@ -23,7 +23,11 @@ var rootCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		//Query API
-		url := fmt.Sprintf("http://transport.opendata.ch/v1/stationboard?station=%s&limit=5", args[0])
+		nb, err := cmd.Flags().GetInt("nConnexions")
+		if err != nil {
+			log.Fatalln(err)
+		}
+		url := fmt.Sprintf("http://transport.opendata.ch/v1/stationboard?station=%s&limit=%d", args[0], nb)
 		resp, err := http.Get(url)
 		if err != nil {
 			log.Fatalln(err)
@@ -85,7 +89,7 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().IntP("nConnexions", "n", 5, "nombre de connexions à afficher")
 }
 
 //Structs
