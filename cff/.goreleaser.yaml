@@ -14,12 +14,14 @@ before:
     - go mod tidy
 
 builds:
-  - env:
+  - id: cff-cli
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
       - windows
       - darwin
+    binary: cff
 
 archives:
   - formats: [tar.gz]

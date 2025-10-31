@@ -1,33 +1,57 @@
 /*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
+Copyright © 2025 Aurélien Bulliard
 */
 package cmd
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
 	"github.com/spf13/cobra"
 )
 
+//go:embed ascii_train.txt
+var asciiArt string
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cff <gare>",
 	Short: "Liste les prochains départs depuis la gare CFF donnée.",
-	Long:  `Un outil CLI qui permet de lister les départs de train de n'importe quelle gare Suisse.`,
-	Args:  cobra.ExactArgs(1),
+	Long:  asciiArt + "\nUn outil CLI qui permet de lister les départs de train de n'importe quelle gare Suisse.",
+	Example: `# Afficher les 5 prochains départs depuis Fribourg
+cff Fribourg
+
+# Afficher les 10 prochains départs depuis Romont
+cff Romont -n 10
+
+# Afficher les départs à une date/heure donnée
+cff Fribourg -d "2025-01-11 13:30"`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		//Query API
+		//Prepare URL depending on the flags
 		nb, err := cmd.Flags().GetInt("nConnexions")
 		if err != nil {
 			log.Fatalln(err)
 		}
-		url := fmt.Sprintf("http://transport.opendata.ch/v1/stationboard?station=%s&limit=%d", args[0], nb)
+		date, err := cmd.Flags().GetString("date")
+		//encode
+		encodedDate := url.QueryEscape(date)
+		var url string
+		if err != nil {
+			log.Fatalln(err)
+		} else if date != "" {
+			url = fmt.Sprintf("http://transport.opendata.ch/v1/stationboard?station=%s&limit=%d&datetime=%s", args[0], nb, encodedDate)
+		} else {
+			url = fmt.Sprintf("http://transport.opendata.ch/v1/stationboard?station=%s&limit=%d", args[0], nb)
+		}
+		//Query API
 		resp, err := http.Get(url)
 		if err != nil {
 			log.Fatalln(err)
@@ -43,8 +67,12 @@ var rootCmd = &cobra.Command{
 		if errJson != nil {
 			log.Fatalln(errJson)
 		}
+		if date != "" {
+			fmt.Printf("%d départs dès le %s depuis %s:\n", len(sb.Stationboard), date, sb.Stationboard[0].Stop.Station.Name)
+		} else {
+			fmt.Printf("%d prochains départs depuis %s:\n", len(sb.Stationboard), sb.Stationboard[0].Stop.Station.Name)
+		}
 
-		fmt.Printf("5 prochains départs depuis %s:\n", sb.Stationboard[0].Stop.Station.Name)
 		fmt.Println("---------------------------------------------")
 		for _, entry := range sb.Stationboard {
 			var color string
@@ -53,10 +81,14 @@ var rootCmd = &cobra.Command{
 				color = "97;41"
 			case "IR":
 				color = "97;101"
-			case "S":
-				color = "30;107"
 			case "RE":
 				color = "31;107"
+			case "TGV":
+				color = "3;97;41"
+			case "EC":
+				color = "3;97;41"
+			default:
+				color = "30;107"
 			}
 			fmt.Printf("\033[%sm%s%s\033[0m --> \033[1m%s\033[0m \n", color, entry.Category, entry.Number, entry.To)
 			t, err := time.Parse("2006-01-02T15:04:05-0700", entry.Stop.Departure)
@@ -89,6 +121,7 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
+	rootCmd.Flags().StringP("date", "d", "", "date/heure, format: \"2025-10-31 17:30\"")
 	rootCmd.Flags().IntP("nConnexions", "n", 5, "nombre de connexions à afficher")
 }
 
