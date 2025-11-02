@@ -50,6 +50,9 @@ gitlab_urls:
   download: https://forge.hefr.ch
 
 release:
+  github:
+    owner: aurel-bul
+    name: cff-cli
   footer: >-
 
     ---
