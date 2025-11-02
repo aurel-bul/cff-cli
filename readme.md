@@ -53,13 +53,13 @@ Exemple:
 <summary>Linux/MacOS</summary>
 
 ```sh
-./cff <de> <à>
+./cff trip <de> <à>
 ```
 
 Exemple:
 
 ```sh
-./cff Romont Fribourg
+./cff trip Romont Fribourg
 ```
 
 </details>
@@ -67,13 +67,13 @@ Exemple:
 <summary>Windows</summary>
 
 ```cmd
-.\cff.exe <de> <à>
+.\cff.exe trip <de> <à>
 ```
 
 Exemple:
 
 ```cmd
-.\cff.exe Romont Fribourg
+.\cff.exe trip Romont Fribourg
 ```
 
 </details>
