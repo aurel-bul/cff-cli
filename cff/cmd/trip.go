@@ -16,7 +16,18 @@ import (
 )
 
 func ftrip(cmd *cobra.Command, args []string) {
-	url := fmt.Sprintf("http://transport.opendata.ch/v1/connections?from=%s&to=%s", args[0], args[1])
+	date, err := cmd.Flags().GetString("date")
+	heure, err2 := cmd.Flags().GetString("heure")
+	var url string
+	if err != nil || err2 != nil {
+		log.Fatalln(err)
+	} else if heure != "" && date != "" {
+		url = fmt.Sprintf("http://transport.opendata.ch/v1/connections?from=%s&to=%s&date=%s&time=%s", args[0], args[1], date, heure)
+	} else if heure != "" && date == "" {
+		url = fmt.Sprintf("http://transport.opendata.ch/v1/connections?from=%s&to=%s&time=%s", args[0], args[1], heure)
+	} else {
+		url = fmt.Sprintf("http://transport.opendata.ch/v1/connections?from=%s&to=%s", args[0], args[1])
+	}
 	//Query API
 	resp, err := http.Get(url)
 	if err != nil {

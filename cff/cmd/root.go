@@ -35,7 +35,10 @@ var trip = &cobra.Command{
 	Short: "Décrit le prochain trajet le plus court entre les deux gares données.",
 	Long:  asciiArt + "\nDécrit le prochain trajet le plus court entre les deux gares données en paramètres.",
 	Example: `# Afficher le prochain trajet entre Romont et Fribourg
-cff trip Romont Fribourg`,
+cff trip Romont Fribourg
+
+# Afficher le premier trajet pour aller de Fribourg à Bern le 03.11.2025 à 13h30
+cff trip Fribourg Bern -d 2025-03-11 -t 13:30`,
 	Args: cobra.ExactArgs(2),
 	Run:  ftrip,
 }
@@ -53,6 +56,8 @@ func init() {
 	rootCmd.Flags().StringP("date", "d", "", "date/heure, format: \"2025-10-31 17:30\"")
 	rootCmd.Flags().IntP("nConnexions", "n", 5, "nombre de connexions à afficher")
 	rootCmd.AddCommand(trip)
+	trip.Flags().StringP("date", "d", "", "date du départ, format: \"2025-10-31\"")
+	trip.Flags().StringP("heure", "t", "", "heure du départ, format: \"17:30\"")
 }
 
 //Structs
