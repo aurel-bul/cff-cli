@@ -85,7 +85,6 @@ Exemple de trajet:
 
 ## Bugs connus
 
-- Les retards ne sont ni affichés ni pris en compte
 - Le nombre de départs d'une gare est parfois faux si plusieurs trains partent à la même heure
 
 ## Crédits
