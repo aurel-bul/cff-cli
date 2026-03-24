@@ -75,7 +75,7 @@ brews:
   - name: cff-cli
     repository:
       owner: aurel-bul
-      name: homebrew-cff
+      name: homebrew-cff_cli
     description: "CLI tool to view the timetables of the Swiss federal railways (SBB CFF FFS)."
     homepage: "https://github.com/aurel-bul/cff-cli"
     commit_author:
