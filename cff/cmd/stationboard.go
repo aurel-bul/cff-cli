@@ -75,9 +75,18 @@ func fstationboard(cmd *cobra.Command, args []string) {
 		fmt.Printf("\033[%sm%s%s\033[0m --> \033[1m%s\033[0m \n", color, entry.Category, entry.Number, entry.To)
 		t, err := time.Parse("2006-01-02T15:04:05-0700", entry.Stop.Departure)
 		if err != nil {
-			fmt.Println("Départ:", entry.Stop.Departure) // fallback
+			// fallback
+			if entry.Stop.Delay != nil && *entry.Stop.Delay != 0 {
+				fmt.Printf("Départ: %s \033[93m+%d\033[0m\n", entry.Stop.Departure, *entry.Stop.Delay)
+			} else {
+				fmt.Printf("Départ: %s\n", entry.Stop.Departure)
+			}
 		} else {
-			fmt.Println("Départ:", t.Format("15:04"))
+			if entry.Stop.Delay != nil && *entry.Stop.Delay != 0 {
+				fmt.Printf("Départ: %s \033[93m+%d\033[0m\n", t.Format("15:04"), *entry.Stop.Delay)
+			} else {
+				fmt.Printf("Départ: %s\n", t.Format("15:04"))
+			}
 		}
 		fmt.Println("Voie:", entry.Stop.Platform)
 		fmt.Println("---------------------------------------------")

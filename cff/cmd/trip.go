@@ -87,17 +87,29 @@ func ftrip(cmd *cobra.Command, args []string) {
 				arrivalTime = at.Format("15:04")
 			}
 			if section.Departure.Platform != "" {
-				fmt.Printf("%s * %-25s Voie %s\n", departureTime, section.Departure.Station.Name, section.Departure.Platform)
+				fmt.Printf("%s * %-25s Voie %s", departureTime, section.Departure.Station.Name, section.Departure.Platform)
 			} else {
-				fmt.Printf("%s * %s\n", departureTime, section.Departure.Station.Name)
+				fmt.Printf("%s * %s", departureTime, section.Departure.Station.Name)
+			}
+			var depdelay = section.Departure.Delay
+			if *depdelay != 0 && depdelay != nil {
+				fmt.Printf("   \033[93m+%d min\033[0m\n", *depdelay)
+			} else {
+				fmt.Printf("\n")
 			}
 			fmt.Println("      |")
 			fmt.Printf("      | \033[%sm%s%s\033[0m Direction %s\n", color, section.Journey.Category, section.Journey.Number, section.Arrival.Station.Name)
 			fmt.Println("      |")
 			if section.Arrival.Platform != "" {
-				fmt.Printf("%s * %-25s Voie %s\n", arrivalTime, section.Arrival.Station.Name, section.Arrival.Platform)
+				fmt.Printf("%s * %-25s Voie %s", arrivalTime, section.Arrival.Station.Name, section.Arrival.Platform)
 			} else {
-				fmt.Printf("%s * %s\n", arrivalTime, section.Arrival.Station.Name)
+				fmt.Printf("%s * %s", arrivalTime, section.Arrival.Station.Name)
+			}
+			var arrdelay = section.Arrival.Delay
+			if *arrdelay != 0 && arrdelay != nil {
+				fmt.Printf("   \033[93m+%d min\033[0m\n", *arrdelay)
+			} else {
+				fmt.Printf("\n")
 			}
 
 		}
