@@ -73,10 +73,9 @@ chocolateys:
 
 brews:
   - name: cff-cli
-    tap:
+    github:
       owner: aurel-bul
-      name: homebrew-cff_cli
-    folder: Formula
+      name: homebrew-cff
     commit_author:
       name: "ORLi1"
       email: "aurelien.bulliard@gmail.com"
