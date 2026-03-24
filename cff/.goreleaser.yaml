@@ -70,3 +70,13 @@ chocolateys:
     release_notes: "{{ .Changelog }}"
 
     api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
+
+brews:
+  - name: cff-cli
+    tap:
+      owner: aurel-bul
+      name: homebrew-cff_cli
+    folder: Formula
+    commit_author:
+      name: "ORLi1"
+      email: "aurelien.bulliard@gmail.com"
