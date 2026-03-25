@@ -92,7 +92,7 @@ func ftrip(cmd *cobra.Command, args []string) {
 				fmt.Printf("%s * %s", departureTime, section.Departure.Station.Name)
 			}
 			var depdelay = section.Departure.Delay
-			if *depdelay != 0 && depdelay != nil {
+			if depdelay != nil && *depdelay != 0 {
 				fmt.Printf("   \033[93m+%d min\033[0m\n", *depdelay)
 			} else {
 				fmt.Printf("\n")
@@ -106,7 +106,7 @@ func ftrip(cmd *cobra.Command, args []string) {
 				fmt.Printf("%s * %s", arrivalTime, section.Arrival.Station.Name)
 			}
 			var arrdelay = section.Arrival.Delay
-			if *arrdelay != 0 && arrdelay != nil {
+			if arrdelay != nil && *arrdelay != 0 {
 				fmt.Printf("   \033[93m+%d min\033[0m\n", *arrdelay)
 			} else {
 				fmt.Printf("\n")
