@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -18,8 +19,9 @@ import (
 func ftrip(cmd *cobra.Command, args []string) {
 	date, err := cmd.Flags().GetString("date")
 	heure, err2 := cmd.Flags().GetString("heure")
+	nConnexions, err3 := cmd.Flags().GetInt("nConnexions")
 	var url string
-	if err != nil || err2 != nil {
+	if err != nil || err2 != nil || err3 != nil {
 		log.Fatalln(err)
 	} else if heure != "" && date != "" {
 		url = fmt.Sprintf("http://transport.opendata.ch/v1/connections?from=%s&to=%s&date=%s&time=%s", args[0], args[1], date, heure)
@@ -49,7 +51,8 @@ func ftrip(cmd *cobra.Command, args []string) {
 		fmt.Println("Aucune connexion trouvée pour les paramètres donnés...")
 		return
 	}
-	fmt.Printf("Trajet de %s à %s:\n", args[0], args[1])
+	fmt.Printf("Prochain(s) trajet(s) de %s à %s:\n", args[0], args[1])
+	var n = 1
 	for _, connection := range conn.Connections {
 		fmt.Println("--------------------------------------------------")
 		for _, section := range connection.Sections {
@@ -59,7 +62,12 @@ func ftrip(cmd *cobra.Command, args []string) {
 				continue
 			}
 			var color string
-			switch section.Journey.Category {
+			var category = section.Journey.Category
+			if category == "TGV" || category == "EC" || category == "TER" || category == "RJX" {
+				//Correct the category by excluding train number
+				section.Journey.Number = ""
+			}
+			switch category {
 			case "IC":
 				color = "97;41"
 			case "IR":
@@ -114,7 +122,39 @@ func ftrip(cmd *cobra.Command, args []string) {
 
 		}
 		fmt.Println("--------------------------------------------------")
-		break
+		var d, h, m, s int
+		fmt.Sscanf(connection.Duration, "%dd%d:%d:%d", &d, &h, &m, &s)
+		fmt.Printf("Temps total: %s\n", formatDuration(d, h, m, s))
+		fmt.Println("==================================================")
+		//Exit if nConnexions reached
+		if n >= nConnexions {
+			break
+		} else {
+			n++
+		}
 	}
 
+}
+
+func formatDuration(d, h, m, s int) string {
+	result := ""
+	if d > 0 {
+		result += fmt.Sprintf("%dj ", d)
+	}
+
+	if h > 0 {
+		result += fmt.Sprintf("%dh ", h)
+	}
+	if m > 0 {
+		result += fmt.Sprintf("%dmin ", m)
+	}
+	if s > 0 && d == 0 {
+		result += fmt.Sprintf("%ds ", s)
+	}
+
+	if result == "" {
+		return "0min"
+	}
+
+	return strings.TrimSpace(result)
 }

@@ -58,6 +58,11 @@ func fstationboard(cmd *cobra.Command, args []string) {
 	fmt.Println("---------------------------------------------")
 	for _, entry := range sb.Stationboard {
 		var color string
+		var category = entry.Category
+		if category == "TGV" || category == "EC" || category == "TER" || category == "RJX" {
+			//Correct the category by excluding train number
+			entry.Number = ""
+		}
 		switch entry.Category {
 		case "IC":
 			color = "97;41"
