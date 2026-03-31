@@ -51,26 +51,6 @@ release:
 
     Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
 
-chocolateys:
-  - name: cff-cli
-    title: CFF CLI
-    authors: ORLi1
-    project_url: https://github.com/aurel-bul/cff-cli
-    url_template: "https://github.com/aurel-bul/cff-cli/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    license_url: https://github.com/aurel-bul/cff-cli/blob/main/LICENSE
-    require_license_acceptance: false
-    project_source_url: https://github.com/aurel-bul/cff-cli
-    docs_url: https://github.com/aurel-bul/cff-cli#readme
-    bug_tracker_url: https://github.com/aurel-bul/cff-cli/issues
-    tags: "cli go SBB CFF FFS"
-    summary: CLI tool to view the timetables of the Swiss federal railways (SBB CFF FFS).
-    description: |
-      CLI tool to view the timetables of the Swiss federal railways (SBB CFF FFS). Fully developed in Go. It uses Opendata Switzerland's Transport API.
-
-    release_notes: "{{ .Changelog }}"
-
-    api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
-
 brews:
   - name: cff-cli
     repository:
