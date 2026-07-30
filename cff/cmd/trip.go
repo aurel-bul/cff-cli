@@ -45,7 +45,7 @@ func ftrip(cmd *cobra.Command, args []string) {
 
 	fmt.Printf("Prochain(s) trajet(s) de %s à %s:\n", args[0], args[1])
 	for i, connection := range shown {
-		printConnection(i+1, connection)
+		printConnection(i+1, connection, Basic)
 	}
 }
 

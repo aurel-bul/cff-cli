@@ -8,7 +8,14 @@ import (
 	"time"
 )
 
-func printConnection(id int, connection Connection) {
+type PrintMode int
+
+const (
+    Basic PrintMode = iota //0
+	Details //1
+)
+
+func printConnection(id int, connection Connection, mode PrintMode) {
 	fmt.Printf("Trajet #%d\n", id)
 	fmt.Println("--------------------------------------------------")
 	for _, section := range connection.Sections {
@@ -81,5 +88,15 @@ func printConnection(id int, connection Connection) {
 	var d, h, m, s int
 	fmt.Sscanf(connection.Duration, "%dd%d:%d:%d", &d, &h, &m, &s)
 	fmt.Printf("Temps total: %s\n", formatDuration(d, h, m, s))
+	fmt.Println("--------------------------------------------------")
+	fmt.Println("Carte du trajet:")
+	points := collectStations(connection)
+	frame, err := renderTripMap(points)
+	if err != nil {
+		fmt.Println("(carte indisponible)")
+	} else {
+		fmt.Println(frame)
+	}
+
 	fmt.Println("==================================================")
 }

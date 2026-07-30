@@ -43,7 +43,7 @@ func fdetails(cmd *cobra.Command, args []string) {
 			log.Fatalln("ID de trajet invalide, doit être entre 1 et", len(cache.Connections))
 		}
 
-		printConnection(id, cache.Connections[id-1])
+		printConnection(id, cache.Connections[id-1], Details)
 		return
 	}
 
@@ -64,6 +64,6 @@ func fdetails(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	printConnection(1, conn.Connections[0])
+	printConnection(1, conn.Connections[0], Details)
 
 }
