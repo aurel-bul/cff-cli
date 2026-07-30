@@ -16,35 +16,49 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func ftrip(cmd *cobra.Command, args []string) {
-	date, err := cmd.Flags().GetString("date")
-	heure, err2 := cmd.Flags().GetString("heure")
-	nConnexions, err3 := cmd.Flags().GetInt("nConnexions")
+func fetchConnections(from, to, date, heure string) (Connections, error){
 	var url string
-	if err != nil || err2 != nil || err3 != nil {
-		log.Fatalln(err)
-	} else if heure != "" && date != "" {
-		url = fmt.Sprintf("http://transport.opendata.ch/v1/connections?from=%s&to=%s&date=%s&time=%s", args[0], args[1], date, heure)
-	} else if heure != "" && date == "" {
-		url = fmt.Sprintf("http://transport.opendata.ch/v1/connections?from=%s&to=%s&time=%s", args[0], args[1], heure)
-	} else {
-		url = fmt.Sprintf("http://transport.opendata.ch/v1/connections?from=%s&to=%s", args[0], args[1])
+	switch {
+	case heure != "" && date != "":
+		url = fmt.Sprintf("http://transport.opendata.ch/v1/connections?from=%s&to=%s&date=%s&time=%s", from, to, date, heure)
+	case heure != "" && date == "":
+		url = fmt.Sprintf("http://transport.opendata.ch/v1/connections?from=%s&to=%s&time=%s", from, to, heure)
+	default:
+		url = fmt.Sprintf("http://transport.opendata.ch/v1/connections?from=%s&to=%s", from, to)
 	}
+
 	//Query API
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Fatalln(err)
+		return Connections{}, err
 	}
+	defer resp.Body.Close()
 	//Read response:
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		return Connections{}, err
 	}
 	//Parse
 	var conn Connections
 	errJson := json.Unmarshal(body, &conn)
 	if errJson != nil {
-		log.Fatalln(errJson)
+		return Connections{}, errJson
+	}
+	return conn, nil
+}
+
+func ftrip(cmd *cobra.Command, args []string) {
+	date, err := cmd.Flags().GetString("date")
+	heure, err2 := cmd.Flags().GetString("heure")
+	nConnexions, err3 := cmd.Flags().GetInt("nConnexions")
+
+	if err != nil || err2 != nil || err3 != nil {
+		log.Fatalln(err)
+	}
+
+	conn, err := fetchConnections(args[0], args[1], date, heure)
+	if err != nil {
+		log.Fatalln(err)
 	}
 	//Check if connexions found
 	if len(conn.Connections) == 0 {
