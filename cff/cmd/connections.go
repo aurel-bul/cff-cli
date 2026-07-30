@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 Aurélien Bulliard
+Copyright © 2026 Aurélien Bulliard
 */
 package cmd
 
