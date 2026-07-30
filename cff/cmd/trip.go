@@ -7,6 +7,7 @@ import (
 	_ "embed"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -32,10 +33,21 @@ func ftrip(cmd *cobra.Command, args []string) {
 		fmt.Println("Aucune connexion trouvée pour les paramètres donnés...")
 		return
 	}
+
+	//Limit to the number of connections actually shown, so IDs match what's cached
+	shown := conn.Connections
+	if len(shown) > nConnexions {
+		shown = shown[:nConnexions]
+	}
+
+	if err := saveTripCache(args[0], args[1], shown); err != nil {
+		fmt.Fprintln(os.Stderr, "Impossible de sauvegarder le cache:", err)
+	}
+
 	fmt.Printf("Prochain(s) trajet(s) de %s à %s:\n", args[0], args[1])
-	var n = 1
-	for _, connection := range conn.Connections {
+	for i, connection := range shown {
 		fmt.Println("--------------------------------------------------")
+		fmt.Printf("Trajet [%d]\n", i+1)
 		for _, section := range connection.Sections {
 			if section.Journey == nil {
 				walkDuration := time.Duration(*section.Arrival.ArrivalTimestamp-*section.Departure.DepartureTimestamp) * time.Second
@@ -107,14 +119,7 @@ func ftrip(cmd *cobra.Command, args []string) {
 		fmt.Sscanf(connection.Duration, "%dd%d:%d:%d", &d, &h, &m, &s)
 		fmt.Printf("Temps total: %s\n", formatDuration(d, h, m, s))
 		fmt.Println("==================================================")
-		//Exit if nConnexions reached
-		if n >= nConnexions {
-			break
-		} else {
-			n++
-		}
 	}
-
 }
 
 func formatDuration(d, h, m, s int) string {
