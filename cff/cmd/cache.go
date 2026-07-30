@@ -53,3 +53,23 @@ func saveTripCache(from, to string, connections []Connection) error {
 
 	return os.WriteFile(path, data, 0644)
 }
+
+//Loads cache json
+func loadTripCache() (TripCache, error) {
+	path, err := cacheFilePath()
+	if err != nil {
+		return TripCache{}, err
+	}
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return TripCache{}, err
+	}
+
+	var cache TripCache
+	if err := json.Unmarshal(data, &cache); err != nil {
+		return TripCache{}, err
+	}
+
+	return cache, nil
+}
