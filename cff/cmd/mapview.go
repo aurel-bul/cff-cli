@@ -40,7 +40,7 @@ func collectStations(connection Connection) []mapPoint {
 	return points
 }
 
-func renderTripMap(points []mapPoint) (string, error) {
+func renderTripMap(points []mapPoint, width, height int) (string, error) {
 	if len(points) == 0 {
 		return "", fmt.Errorf("aucune gare à afficher")
 	}
@@ -70,8 +70,8 @@ func renderTripMap(points []mapPoint) (string, error) {
 
 	m, err := mapscii.New(mapscii.Options{
 		Provider: provider,
-		Width:    100,
-		Height:   30,
+		Width:    width,
+		Height:   height,
 		Center:   mapscii.LatLon{Lat: centerLat, Lon: centerLon},
 		Zoom:     zoomForDistance(spanKm),
 		Style:    sty,
@@ -126,9 +126,9 @@ func zoomForDistance(distanceKm float64) float64 {
 	case distanceKm < 200:
 		return 6.5
 	case distanceKm < 400:
-		return 5.5
+		return 6
 	case distanceKm < 500:
-		return 5
+		return 5.5
 	case distanceKm < 600:
 		return 4
 	case distanceKm < 700:

@@ -59,9 +59,6 @@ func init() {
 	trip.Flags().StringP("date", "d", "", "date du départ, format: \"2025-10-31\"")
 	trip.Flags().StringP("heure", "t", "", "heure du départ, format: \"17:30\"")
 	trip.Flags().IntP("nConnexions", "n", 5, "nombre de connexions à afficher (défaut=5)")
-	rootCmd.AddCommand(details)
-	details.Flags().StringP("date", "d", "", "date du départ, format: \"2025-10-31\"")
-	details.Flags().StringP("heure", "t", "", "heure du départ, format: \"17:30\"")
 }
 
 //Structs

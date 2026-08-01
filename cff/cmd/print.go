@@ -1,27 +1,19 @@
-/*
-Copyright © 2026 Aurélien Bulliard
-*/
 package cmd
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
-type PrintMode int
-
-const (
-    Basic PrintMode = iota //0
-	Details //1
-)
-
-func printConnection(id int, connection Connection, mode PrintMode) {
-	fmt.Printf("Trajet #%d\n", id)
-	fmt.Println("--------------------------------------------------")
+func printConnection(id int, connection Connection) {
+	var detail strings.Builder
+	fmt.Fprintf(&detail, "Trajet [%d]\n", id)
+	fmt.Fprintln(&detail, "--------------------------------------------------")
 	for _, section := range connection.Sections {
 		if section.Journey == nil {
 			walkDuration := time.Duration(*section.Arrival.ArrivalTimestamp-*section.Departure.DepartureTimestamp) * time.Second
-			fmt.Printf("\n%dmin Correspondance / Marche de %s à %s\n\n", int(walkDuration.Minutes()+0.5), section.Departure.Station.Name, section.Arrival.Station.Name)
+			fmt.Fprintf(&detail, "\n%dmin Marche de %s à %s\n\n", int(walkDuration.Minutes()+0.5), section.Departure.Station.Name, section.Arrival.Station.Name)
 			continue
 		}
 		var color string
@@ -58,45 +50,61 @@ func printConnection(id int, connection Connection, mode PrintMode) {
 			arrivalTime = at.Format("15:04")
 		}
 		if section.Departure.Platform != "" {
-			fmt.Printf("%s * %-25s Voie %s", departureTime, section.Departure.Station.Name, section.Departure.Platform)
+			fmt.Fprintf(&detail, "%s * %-25s Voie %s", departureTime, section.Departure.Station.Name, section.Departure.Platform)
 		} else {
-			fmt.Printf("%s * %s", departureTime, section.Departure.Station.Name)
+			fmt.Fprintf(&detail, "%s * %s", departureTime, section.Departure.Station.Name)
 		}
 		var depdelay = section.Departure.Delay
 		if depdelay != nil && *depdelay != 0 {
-			fmt.Printf("   \033[93m+%d min\033[0m\n", *depdelay)
+			fmt.Fprintf(&detail, "   \033[93m+%d min\033[0m\n", *depdelay)
 		} else {
-			fmt.Printf("\n")
+			fmt.Fprintf(&detail, "\n")
 		}
-		fmt.Println("      |")
-		fmt.Printf("      | \033[%sm%s%s\033[0m Direction %s\n", color, section.Journey.Category, section.Journey.Number, section.Arrival.Station.Name)
-		fmt.Println("      |")
+		fmt.Fprintln(&detail, "      |")
+		fmt.Fprintf(&detail, "      | \033[%sm%s%s\033[0m Direction %s\n", color, section.Journey.Category, section.Journey.Number, section.Arrival.Station.Name)
+		fmt.Fprintln(&detail, "      |")
 		if section.Arrival.Platform != "" {
-			fmt.Printf("%s * %-25s Voie %s", arrivalTime, section.Arrival.Station.Name, section.Arrival.Platform)
+			fmt.Fprintf(&detail, "%s * %-25s Voie %s", arrivalTime, section.Arrival.Station.Name, section.Arrival.Platform)
 		} else {
-			fmt.Printf("%s * %s", arrivalTime, section.Arrival.Station.Name)
+			fmt.Fprintf(&detail, "%s * %s", arrivalTime, section.Arrival.Station.Name)
 		}
 		var arrdelay = section.Arrival.Delay
 		if arrdelay != nil && *arrdelay != 0 {
-			fmt.Printf("   \033[93m+%d min\033[0m\n", *arrdelay)
+			fmt.Fprintf(&detail, "   \033[93m+%d min\033[0m\n", *arrdelay)
 		} else {
-			fmt.Printf("\n")
+			fmt.Fprintf(&detail, "\n")
 		}
 
 	}
-	fmt.Println("--------------------------------------------------")
+	fmt.Fprintln(&detail, "--------------------------------------------------")
 	var d, h, m, s int
 	fmt.Sscanf(connection.Duration, "%dd%d:%d:%d", &d, &h, &m, &s)
-	fmt.Printf("Temps total: %s\n", formatDuration(d, h, m, s))
-	fmt.Println("--------------------------------------------------")
-	fmt.Println("Carte du trajet:")
+	fmt.Fprintf(&detail, "Temps total: \033[1m%s\033[0m\n", formatDuration(d, h, m, s))
+	fmt.Fprintf(&detail, "Nombre de correspondances: %d\n", connection.Transfers)
 	points := collectStations(connection)
-	frame, err := renderTripMap(points)
-	if err != nil {
-		fmt.Println("(carte indisponible)")
-	} else {
-		fmt.Println(frame)
+
+	detailWidth := blockWidth(detail.String())
+	termWidth, termHeight := terminalSize()
+
+	const gap = 2
+	mapWidth := termWidth - detailWidth - gap
+	if mapWidth < 20 {
+		mapWidth = 20
+	}
+	mapHeight := termHeight - 6
+	if mapHeight < 10 {
+		mapHeight = 10
 	}
 
-	fmt.Println("==================================================")
+	frame, err := renderTripMap(points, mapWidth, mapHeight)
+	if err != nil {
+		fmt.Print(detail.String())
+		fmt.Println("(carte indisponible)")
+		fmt.Println(strings.Repeat("=", detailWidth))
+		return
+	}
+
+	merged := sideBySide(detail.String(), frame, gap)
+	fmt.Print(merged)
+	fmt.Println(strings.Repeat("=", blockWidth(merged)))
 }
