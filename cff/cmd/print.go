@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func printConnection(id int, connection Connection) {
+func printConnection(id int, connection Connection, showMap bool) {
 	var detail strings.Builder
 	fmt.Fprintf(&detail, "Trajet [%d]\n", id)
 	fmt.Fprintln(&detail, "--------------------------------------------------")
@@ -81,9 +81,16 @@ func printConnection(id int, connection Connection) {
 	fmt.Sscanf(connection.Duration, "%dd%d:%d:%d", &d, &h, &m, &s)
 	fmt.Fprintf(&detail, "Temps total: \033[1m%s\033[0m\n", formatDuration(d, h, m, s))
 	fmt.Fprintf(&detail, "Nombre de correspondances: %d\n", connection.Transfers)
-	points := collectStations(connection)
 
 	detailWidth := blockWidth(detail.String())
+
+	if !showMap {
+		fmt.Print(detail.String())
+		fmt.Println(strings.Repeat("=", detailWidth))
+		return
+	}
+
+	points := collectStations(connection)
 	termWidth, termHeight := terminalSize()
 
 	const gap = 2
